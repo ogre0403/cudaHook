@@ -35,30 +35,19 @@ CXXFLAGS += -O2
 endif
 
 # Target rules
-all: libcuhook.so.1 cuHook
+all: queryDevice
 
 
+queryDevice.o: queryDevice.cpp 
+	$(NVCC) -m64 --compiler-options "$(CXXFLAGS)" $(GENCODE_FLAGS) -I. -o $@ -c $<
 
 
-libcuhook.o: libcuhook.cpp libcuhook.h
-	$(NVCC) -m64 --compiler-options "$(CXXFLAGS)" $(GENCODE_FLAGS) -o $@ -c $<
-
-libcuhook.so.1: libcuhook.o
-	$(EXEC) $(NVCC) -shared -m64 $(GENCODE_FLAGS) -o $@ $+ $(CUDA_LDFLAGS) $(LDFLAGS)
-
-
-cuHook.o: cuHook.cpp 
-	$(NVCC) -m64 --compiler-options "$(CXXFLAGS)" $(GENCODE_FLAGS) -o $@ -c $<
-
-
-cuHook: cuHook.o
-	$(EXEC) $(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) -o $@ $+ $(CUDA_LDFLAGS)
-
-
+queryDevice: queryDevice.o
+	$(NVCC) $(ALL_LDFLAGS) $(GENCODE_FLAGS) $(CUDA_LDFLAGS) -o $@ $+ 
 
 
 clean:
 	rm -f *.o
 	rm -f *.so.1
 	rm -f *.so
-	rm -f cuHook
+	rm -f queryDevice
